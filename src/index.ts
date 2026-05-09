@@ -7,6 +7,7 @@ import { issue, verify, type SessionPayload } from "./session";
 
 export type { SessionPayload } from "./session";
 export { AuthError } from "./idtoken";
+export { issue as issueSession, verify as verifySession } from "./session";
 
 export type GoogleAuthConfig = {
   clientId: string;
