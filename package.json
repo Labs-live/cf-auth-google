@@ -1,0 +1,32 @@
+{
+  "name": "cf-auth-google",
+  "version": "0.1.0",
+  "description": "Drop-in Google OAuth for Cloudflare Workers — sign-in, signed session cookies, email allowlist + profile mapping",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": ["src", "README.md"],
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240620.0",
+    "@cloudflare/vitest-pool-workers": "^0.8.59",
+    "typescript": "^5.5.0",
+    "vitest": "^3.2.4",
+    "wrangler": "^3.114.17",
+    "miniflare": "^3.20250718.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auraz/cf-auth-google.git"
+  }
+}
