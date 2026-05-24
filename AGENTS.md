@@ -1,6 +1,6 @@
 # cf-auth-google
 
-Drop-in Google OAuth for Cloudflare Workers. Sign-in with Google, signed session cookies, email allowlist plus profile mapping. ~400 lines, zero runtime dependencies.
+Fork of Google OAuth for Cloudflare Workers. Sign-in with Google, signed session cookies, email allowlist plus profile mapping. ~400 lines, zero runtime dependencies.
 
 ## Install
 
@@ -8,38 +8,17 @@ Drop-in Google OAuth for Cloudflare Workers. Sign-in with Google, signed session
 npm install github:auraz/cf-auth-google
 ```
 
-## Usage
+## Types
 
 ```ts
-import { googleAuth } from "cf-auth-google";
-
 export interface Env {
   DB: D1Database;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   SESSION_KEY: string;
-  ALLOWED_EMAILS: string;   // "kryklia@gmail.com,vira@gmail.com"
+  
   PROFILE_MAP: string;      // '{"kryklia@gmail.com":"oleksandr","vira@gmail.com":"vira"}'
 }
-
-export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
-    const auth = googleAuth({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-      sessionKey: env.SESSION_KEY,
-      allowedEmails: env.ALLOWED_EMAILS.split(","),
-      profileMap: JSON.parse(env.PROFILE_MAP),
-    });
-
-    const handled = await auth.handle(req);
-    if (handled) return handled;
-
-    return auth.protect(req, async (session) => {
-      return new Response(`hello ${session.profile} (${session.email})`);
-    });
-  },
-};
 ```
 
 ## Endpoints exposed
@@ -67,13 +46,6 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 | `sessionMaxAgeSeconds` | no | default 7 days |
 | `origin` | no | override the redirect_uri origin (useful for proxying) |
 
-## Google Cloud setup (one time)
-
-1. Open https://console.cloud.google.com/apis/credentials.
-2. Create OAuth client ID, type **Web application**.
-3. Authorized redirect URIs: `https://your-domain/auth/callback`.
-4. Copy Client ID and Client Secret into your Worker secrets.
-5. Generate a session key: `openssl rand -base64 32`.
 
 ## Security notes
 
@@ -82,11 +54,3 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 - PKCE (S256) is used for the authorization-code flow — not strictly required for confidential web clients, but doesn't hurt and prepares for future SPA usage.
 - The flow cookie carries state + PKCE verifier and is cleared on success.
 - `protect()` redirects browsers to `/auth/login`; API/JSON callers get `401 Unauthorized`.
-
-## Testing
-
-```sh
-npm test
-```
-
-18 tests cover session signing/verification, cookie parsing/serialization, OAuth helpers, and PKCE generation.
